@@ -6,16 +6,15 @@ const Dataform = () => {
     const subject = form.subject.value;
     const message = form.Message.value;
     console.log(email, subject, message);
-    
-  
+
     const dataSend = {
       email: email,
       subject: subject,
       message: message,
     };
-  
-    const baseUrl = "http://localhost:3000";
-  
+
+    const baseUrl = "https://nodemailer-backend-six.vercel.app";
+
     try {
       const res = await fetch(`${baseUrl}/email/sendEmail`, {
         method: "POST",
@@ -25,25 +24,21 @@ const Dataform = () => {
           "Content-Type": "application/json",
         },
       });
-  
-      if (res.ok) { // Check if the response is OK (status code 200-299)
-        const data = await res.json(); // Parse the JSON from the response
-        console.log(data); // Log the parsed JSON
-        alert('Email sent successfully!');
-        form.reset()
+
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data);
+        alert("Email sent successfully!");
+        form.reset();
       } else {
-        console.error('Error:', res.statusText);
-        alert('Failed to send email.');
+        console.error("Error:", res.statusText);
+        alert("Failed to send email.");
       }
-  
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error occurred while sending email.');
+      console.error("Error:", error);
+      alert("Error occurred while sending email.");
     }
   };
-  
-  
-  
 
   return (
     <>
