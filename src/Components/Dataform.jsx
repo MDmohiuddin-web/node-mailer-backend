@@ -1,14 +1,31 @@
+import { useState } from "react";
+import toast from "react-hot-toast";
+
 const Dataform = () => {
+  const [emailFields, setEmailFields] = useState([{ id: 0, value: "" }]);
+
+  const handleAddEmail = () => {
+    const newField = { id: emailFields.length, value: "" };
+    setEmailFields([...emailFields, newField]);
+  };
+
+  const handleEmailChange = (id, value) => {
+    const updatedFields = emailFields.map((field) =>
+      field.id === id ? { ...field, value } : field
+    );
+    setEmailFields(updatedFields);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
-    const email = form.email.value;
+    const emails = emailFields.map((field) => field.value);
     const subject = form.subject.value;
     const message = form.Message.value;
-    console.log(email, subject, message);
+    console.log(emails, subject, message);
 
     const dataSend = {
-      email: email,
+      emails: emails,
       subject: subject,
       message: message,
     };
@@ -28,15 +45,16 @@ const Dataform = () => {
       if (res.ok) {
         const data = await res.json();
         console.log(data);
-        alert("Email sent successfully!");
+        toast.success("Email sent successfully!");
         form.reset();
+        setEmailFields([{ id: 0, value: "" }]);
       } else {
         console.error("Error:", res.statusText);
         alert("Failed to send email.");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error occurred while sending email.");
+      toast.error("Error occurred while sending email.");
     }
   };
 
@@ -55,37 +73,28 @@ const Dataform = () => {
             >
               <p className="text-center text-lg font-medium">Send a message</p>
 
-              <div>
-                <label htmlFor="email" className="sr-only">
-                  Email address
-                </label>
+              {emailFields.map((field) => (
+                <div key={field.id}>
+                  <label htmlFor={`email-${field.id}`} className="sr-only">
+                    Email address
+                  </label>
 
-                <div className="relative">
-                  <input
-                    type="email"
-                    name="email"
-                    className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                    placeholder="Enter email"
-                  />
-
-                  <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="size-4 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
-                      />
-                    </svg>
-                  </span>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      name={`email-${field.id}`}
+                      className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
+                      placeholder="Enter email"
+                      value={field.value}
+                      onChange={(e) =>
+                        handleEmailChange(field.id, e.target.value)
+                      }
+                      onBlur={handleAddEmail}
+                    />
+                  </div>
                 </div>
-              </div>
+              ))}
+
               <div>
                 <label htmlFor="subject" className="sr-only">
                   subject
@@ -116,7 +125,7 @@ const Dataform = () => {
               </div>
 
               <button
-                type="primary"
+                type="submit"
                 className="inline-block rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white w-full"
               >
                 Send Email
