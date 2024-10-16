@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.userauth{
+    background-image: url('/src/assets/authentication1.png');
+}

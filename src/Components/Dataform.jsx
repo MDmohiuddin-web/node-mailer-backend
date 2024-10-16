@@ -13,7 +13,7 @@ const Dataform = () => {
       message: message,
     };
 
-    const baseUrl = "https://nodemailer-backend-six.vercel.app";
+    const baseUrl = "http://localhost:3000";
 
     try {
       const res = await fetch(`${baseUrl}/email/sendEmail`, {
