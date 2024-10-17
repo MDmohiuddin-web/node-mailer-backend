@@ -1,18 +1,27 @@
 import { useContext, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-
+import { PlusOutlined } from "@ant-design/icons";
+import { Image, Upload } from "antd";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
-import { FaEye } from "react-icons/fa6";
-import { FaEyeSlash } from "react-icons/fa";
 import { AuthContext } from "../AUTHPROVIDER/AuthProvider";
+
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
-const Sigup = () => {
-  const { createUser, googleSignIn, updateUserProfile} =
-    useContext(AuthContext);
+const getBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
 
+const Signup = () => {
+  const { createUser, googleSignIn, updateUserProfile, setUser } =
+    useContext(AuthContext);
   const {
     register,
     handleSubmit,
@@ -22,79 +31,113 @@ const Sigup = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location);
   const from = location.state?.from?.pathname || "/";
-  console.log('state from the location', location.state)
   const [password, setPassword] = useState("");
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [fileList, setFileList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const showPassword = () => {
-    // see password
     setPassword(!password);
   };
 
-  // react form using method
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+  };
+
+  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
   const onSubmit = async (data) => {
-    console.log(data);
+    setIsLoading(true);
     try {
-      // Upload image to ImgBB
+      if (fileList.length === 0) {
+        toast.error("Please upload an image");
+        setIsLoading(false);
+        return;
+      }
+
       const formData = new FormData();
-      formData.append('image', data.photoURL[0]);
-      
+      formData.append("image", fileList[0].originFileObj);
+
       const response = await fetch(image_hosting_api, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
-      
+
       const imgData = await response.json();
-      
-      if (imgData.success) {
-        const imgUrl = imgData.data.url;
-        
-        // Create user with email and password
-        const result = await createUser(data.email, data.password);
-        console.log(result.user);
-        toast.success("signup successful");
-        
-        // Update user profile with name and photo URL
-        await updateUserProfile(data.name, imgUrl);
-        reset();
-        navigate(from, { replace: true });
-      } else {
-        toast.error("Image upload failed");
+      if (!imgData.success) {
+        throw new Error("Image upload failed");
       }
+
+      const imgUrl = imgData.data.url;
+
+      const result = await createUser(data.email, data.password);
+      console.log(result.user);
+      toast.success("signup successful");
+
+      await updateUserProfile(data.name, imgUrl);
+      setUser((prevUser) => ({
+        ...prevUser,
+        displayName: data.name,
+        photoURL: imgUrl,
+      }));
+      reset();
+      navigate(from, { replace: true });
     } catch (error) {
       console.error(error);
       toast.error("Signup unsuccessful");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // for google sign in
   const handleGoogleSignIn = () => {
     googleSignIn()
       .then((res) => {
         console.log(res.user);
-
         navigate(from, { replace: true });
-
-        toast.success("google SignIn successfully");
+        toast.success("Google SignIn successfully");
       })
       .catch((error) => {
         console.error(error);
-        toast.error("google SignIn Unsuccessfully");
+        toast.error("Google SignIn Unsuccessful");
       });
   };
 
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+      }}
+      type="button"
+    >
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </button>
+  );
+
   return (
-    <div className="flex w-full mb-10 max-w-sm mx-auto py-20  overflow-hidden bg-white rounded-lg shadow-lg  lg:max-w-4xl ">
-      {/* for img */}
+    <div className="flex w-full mb-10 max-w-sm mx-auto py-20 overflow-hidden bg-white rounded-lg shadow-lg lg:max-w-4xl">
       <div className="hidden bg-cover lg:block lg:w-1/2 userauth rounded-md"></div>
 
       <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
-        <p className="mt-3 text-xl text-center text-black ">Sign Up</p>
+        <p className="mt-3 text-xl text-center text-black">Sign Up</p>
 
         <div
           onClick={handleGoogleSignIn}
+          href="#"
           className="flex items-center justify-center mt-4 text-black transition-colors duration-300 transform border rounded-lg dark:border-gray-700  hover:bg-gray-50 dark:hover:bg-gray-600"
         >
           <div className="px-4 py-2">
@@ -119,28 +162,52 @@ const Sigup = () => {
           </div>
 
           <span className="w-5/6 px-4 py-3 font-bold text-center hover:text-white">
-            Sign up with Google
+            Sign in with Google
           </span>
         </div>
 
         <div className="flex items-center justify-between mt-4">
           <span className="w-1/5 border-b dark:border-gray-600 lg:w-1/4"></span>
-
           <a
             href="#"
-            className="text-xs text-center text-black uppercase  hover:underline"
+            className="text-xs text-center text-black uppercase hover:underline"
           >
             or sign up with email
           </a>
-
           <span className="w-1/5 border-b dark:border-gray-400 lg:w-1/4"></span>
         </div>
-        {/*  */}
 
-        {/*  */}
         <form onSubmit={handleSubmit(onSubmit)}>
+          <div className=" md:text-center w-full mt-4 md:flex justify-center items-center flex-col">
+          <label className="block mb-2 text-sm font-medium text-black">
+             Profile picture
+            </label>
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              onPreview={handlePreview}
+              onChange={handleChange}
+              beforeUpload={() => false}
+            >
+              {fileList.length >= 1 ? null : uploadButton}
+            </Upload>
+            {previewImage && (
+              <Image
+                wrapperStyle={{
+                  display: "none",
+                }}
+                preview={{
+                  visible: previewOpen,
+                  onVisibleChange: (visible) => setPreviewOpen(visible),
+                  afterOpenChange: (visible) => !visible && setPreviewImage(""),
+                }}
+                src={previewImage}
+              />
+            )}
+          </div>
+
           <div className="mt-4">
-            <label className="block mb-2 text-sm font-medium text-black ">
+            <label className="block mb-2 text-sm font-medium text-black">
               Name
             </label>
             <input
@@ -148,7 +215,7 @@ const Sigup = () => {
               name="name"
               type="text"
               placeholder="Name"
-              className="input input-bordered w-full "
+              className="input input-bordered w-full"
             />
             {errors.name && (
               <span className="text-red-600 font-semibold">
@@ -156,24 +223,9 @@ const Sigup = () => {
               </span>
             )}
           </div>
-          <div className="mt-4">
-            <label className="block mb-2 text-sm font-medium text-black ">
-              Photo 
-            </label>
-            <input
-              {...register("photoURL", { required: true })}
-              type="file"
-              className="md:w-1/2 file-input file-input-bordered w-full mt-4"
-            />
-            {errors.photoURL && (
-              <span className="text-red-600 font-semibold">
-                Photo is required
-              </span>
-            )}
-          </div>
 
           <div className="mt-4">
-            <label className="block mb-2 text-sm font-medium text-black ">
+            <label className="block mb-2 text-sm font-medium text-black">
               Email Address
             </label>
             <input
@@ -188,7 +240,7 @@ const Sigup = () => {
 
           <div className="mt-4 relative">
             <div className="flex justify-between">
-              <label className="block mb-2 text-sm font-medium text-black ">
+              <label className="block mb-2 text-sm font-medium text-black">
                 Password
               </label>
             </div>
@@ -198,7 +250,6 @@ const Sigup = () => {
                 required: true,
                 minLength: 6,
                 maxLength: 20,
-               
               })}
               name="password"
               placeholder="Password"
@@ -206,7 +257,6 @@ const Sigup = () => {
               className="input input-bordered w-full"
               type={password ? "text" : "password"}
             />
-            {/* password icon form react icon */}
             <div
               className="flex justify-end p-1 absolute top-10 right-5"
               onClick={showPassword}
@@ -218,33 +268,36 @@ const Sigup = () => {
               <p className="text-red-600">Password required</p>
             )}
             {errors.password?.type === "minLength" && (
-              <p className="text-red-600">Password must be 6 </p>
+              <p className="text-red-600">
+                Password must be 6 characters or more
+              </p>
             )}
             {errors.password?.type === "pattern" && (
               <p className="text-red-600">
-                Password must be One uppercase, one lower case,one number and
-                one special chars
+                Password must have one uppercase, one lowercase, one number and
+                one special character
               </p>
             )}
           </div>
 
           <div className="mt-6">
-            <button className="w-full bg-blue-500 px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform  rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50">
-              Sign Up
+            <button
+              disabled={isLoading}
+              className="w-full bg-blue-500 px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50"
+            >
+              {isLoading ? "Signing Up..." : "Sign Up"}
             </button>
           </div>
         </form>
 
         <div className="flex items-center justify-between mt-4">
           <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
-
           <Link
             to="/Login"
-            className="text-xs text-black uppercase  hover:underline"
+            className="text-xs text-black uppercase hover:underline"
           >
             or <span className="text-blue-700">sign in</span>
           </Link>
-
           <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
         </div>
       </div>
@@ -252,4 +305,4 @@ const Sigup = () => {
   );
 };
 
-export default Sigup;
+export default Signup;

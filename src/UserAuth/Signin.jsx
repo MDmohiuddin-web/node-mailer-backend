@@ -9,23 +9,24 @@ import { AuthContext } from "../AUTHPROVIDER/AuthProvider";
 
 const Signin = () => {
   const { signin, googleSignIn } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
   console.log("state from the location", location.state);
 
-  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const showPassword = () => {
-    setPassword(!password);
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
-    // console.log(email, password);
     signin(email, password)
       .then((res) => {
         toast.success("User login successfully");
@@ -36,24 +37,31 @@ const Signin = () => {
       .catch((error) => {
         console.error(error);
         toast.error("User login Unsuccessfully");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
+
   const handleGoogleSignIn = () => {
+    setIsLoading(true);
     googleSignIn()
       .then((res) => {
         console.log(res.user);
         navigate(from, { replace: true });
-        toast.success("google SignIn successfully");
+        toast.success("Google SignIn successful");
       })
       .catch((error) => {
         console.error(error);
-        toast.error("google SignIn successfully Unsuccessfully");
+        toast.error("Google SignIn unsuccessful");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
   return (
     <div className="flex w-full mb-10 max-w-sm mx-auto py-20  overflow-hidden bg-white rounded-lg shadow-lg  lg:max-w-4xl">
-      {/* for img */}
       <div className="hidden bg-cover lg:block lg:w-1/2 userauth rounded-md"></div>
 
       <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
@@ -61,7 +69,6 @@ const Signin = () => {
 
         <div
           onClick={handleGoogleSignIn}
-          href="#"
           className="flex items-center justify-center mt-4 text-black transition-colors duration-300 transform border rounded-lg dark:border-gray-700  hover:bg-gray-50 dark:hover:bg-gray-600"
         >
           <div className="px-4 py-2">
@@ -130,20 +137,22 @@ const Signin = () => {
               autoComplete="off"
               placeholder="password"
               className="block w-full px-4 py-2 text-gray-700 bg-white border rounded-lg   dark:border-gray-600 focus:border-blue-400 focus:ring-opacity-40 dark:focus:border-blue-300 focus:outline-none focus:ring focus:ring-blue-300"
-              type={password ? "text" : "password"}
+              type={showPassword ? "text" : "password"}
             />
-            {/* password icon form react icon */}
             <div
               className="flex justify-end p-1 absolute top-10 right-5"
-              onClick={showPassword}
+              onClick={togglePasswordVisibility}
             >
-              {password ? <FaEye /> : <FaEyeSlash />}
+              {showPassword ? <FaEye /> : <FaEyeSlash />}
             </div>
           </div>
 
-          <div className="mt-6 gap-5 space-y-3">
-            <button className="w-full px-6 py-3 bg-blue-500 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50">
-              Sign In
+          <div className="mt-6">
+            <button
+              disabled={isLoading}
+              className="w-full bg-blue-500 px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50"
+            >
+              {isLoading ? "Signing In..." : "Sign In"}
             </button>
           </div>
         </form>

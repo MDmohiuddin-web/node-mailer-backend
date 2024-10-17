@@ -1,4 +1,6 @@
 import { useContext, useState } from "react";
+import { PlusOutlined } from "@ant-design/icons";
+import { Image, Upload } from "antd";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../AUTHPROVIDER/AuthProvider";
@@ -7,26 +9,72 @@ import userLogo from "../assets/profile.png";
 const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
 const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
+const getBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+
 const Profile = () => {
   const { updateUserProfile, user, setUser } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState("");
+  const [fileList, setFileList] = useState([]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+    reset,
+    setValue,
+  } = useForm({
+    defaultValues: {
+      name: user?.displayName || "",
+    },
+  });
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+    setPreviewImage(file.url || file.preview);
+    setPreviewOpen(true);
+  };
+
+  const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
+
+  const uploadButton = (
+    <button
+      style={{
+        border: 0,
+        background: "none",
+      }}
+      type="button"
+    >
+      <PlusOutlined />
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </button>
+  );
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    const { name, photoURL } = data;
+    const { name } = data;
 
     try {
       let imageUrl = user?.photoURL;
 
-      if (photoURL[0]) {
+      if (fileList.length > 0 && fileList[0].originFileObj) {
         const formData = new FormData();
-        formData.append("image", photoURL[0]);
+        formData.append("image", fileList[0].originFileObj);
 
         const response = await fetch(image_hosting_api, {
           method: "POST",
@@ -50,6 +98,7 @@ const Profile = () => {
       }));
 
       toast.success("Profile updated successfully!");
+      reset({ name: name });
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Profile update failed.");
@@ -59,10 +108,10 @@ const Profile = () => {
   };
 
   return (
-    <div className="md:py-20">
-      <div className="flex m-auto flex-col justify-center max-w-xs p-6 shadow-md rounded-xl sm:px-12 bg-white dark:bg-white text-gray-100 dark:text-gray-800">
+    <div className="md:py-5">
+      <div className="flex m-auto flex-col justify-center max-w-2xl p-6 shadow-md rounded-xl sm:px-12 bg-white dark:bg-white text-gray-100 dark:text-gray-800">
         <img
-          className="rounded-lg"
+          className="rounded-lg w-48 h-48 mx-auto object-cover"
           src={user?.photoURL || userLogo}
           alt="User profile"
         />
@@ -80,31 +129,48 @@ const Profile = () => {
             <div className="w-full m-auto p-8 space-y-3 rounded-xl bg-gray-900 dark:bg-gray-50 text-gray-100 dark:text-gray-800">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-1 text-sm">
-                  <label className="block text-gray-400 dark:text-gray-600">
+                  <label className="block text-gray-400 dark:text-gray-600 w-full text-left font-bold">
                     Update Username
                   </label>
                   <input
                     type="text"
                     name="name"
-                    defaultValue={user?.displayName}
                     placeholder="Enter Name"
                     {...register("name", { required: true })}
                     className="w-full px-4 py-3 rounded-md border-gray-700 dark:border-gray-300 bg-gray-900 dark:bg-gray-50 text-gray-100 dark:text-gray-800 focus:border-my_color-400 focus:dark:border-my_color-600"
+                    onChange={(e) => setValue("name", e.target.value)}
                   />
                   <small className="text-danger text-red-500">
                     {errors.name && "This field is required"}
                   </small>
                 </div>
                 <div className="space-y-1 text-sm">
-                  <label className="block text-gray-400 dark:text-gray-600">
+                  <label className="block text-gray-400 dark:text-gray-600 w-full text-left font-bold">
                     Update Profile Picture
                   </label>
-                  <input
-                    {...register("photoURL")}
-                    type="file"
-                    accept="image/*"
-                    className="md:w-1/2 file-input file-input-bordered w-full mt-4"
-                  />
+                  <Upload
+                    listType="picture-card"
+                    fileList={fileList}
+                    onPreview={handlePreview}
+                    onChange={handleChange}
+                    beforeUpload={() => false}
+                  >
+                    {fileList.length >= 1 ? null : uploadButton}
+                  </Upload>
+                  {previewImage && (
+                    <Image
+                      wrapperStyle={{
+                        display: "none",
+                      }}
+                      preview={{
+                        visible: previewOpen,
+                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                        afterOpenChange: (visible) =>
+                          !visible && setPreviewImage(""),
+                      }}
+                      src={previewImage}
+                    />
+                  )}
                 </div>
 
                 <button
