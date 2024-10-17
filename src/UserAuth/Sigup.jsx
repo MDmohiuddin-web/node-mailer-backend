@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { FaEye } from "react-icons/fa6";
 import { FaEyeSlash } from "react-icons/fa";
 import { AuthContext } from "../AUTHPROVIDER/AuthProvider";
+const image_hosting_key = import.meta.env.VITE_IMAGE_HOSTING_KEY;
+const image_hosting_api = `https://api.imgbb.com/1/upload?key=${image_hosting_key}`;
 
 const Sigup = () => {
   const { createUser, googleSignIn, updateUserProfile} =
@@ -32,26 +34,39 @@ const Sigup = () => {
 
   // react form using method
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log(data);
-    createUser(data.email, data.password)
-      .then((result) => {
-        console.log(result.user);
-        toast.success("signup success full");
-        navigate(from, { replace: true });
-        updateUserProfile(data.name, data.photoURL)
-          .then(() => {
-            reset();
-          })
-          .catch((error) => {
-            console.error(error);
-            toast.error("Update profile Unsuccess full");
-          });
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("signup Unsuccess full");
+    try {
+      // Upload image to ImgBB
+      const formData = new FormData();
+      formData.append('image', data.photoURL[0]);
+      
+      const response = await fetch(image_hosting_api, {
+        method: 'POST',
+        body: formData,
       });
+      
+      const imgData = await response.json();
+      
+      if (imgData.success) {
+        const imgUrl = imgData.data.url;
+        
+        // Create user with email and password
+        const result = await createUser(data.email, data.password);
+        console.log(result.user);
+        toast.success("signup successful");
+        
+        // Update user profile with name and photo URL
+        await updateUserProfile(data.name, imgUrl);
+        reset();
+        navigate(from, { replace: true });
+      } else {
+        toast.error("Image upload failed");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Signup unsuccessful");
+    }
   };
 
   // for google sign in
@@ -143,17 +158,16 @@ const Sigup = () => {
           </div>
           <div className="mt-4">
             <label className="block mb-2 text-sm font-medium text-black ">
-              Photo url
+              Photo 
             </label>
             <input
               {...register("photoURL", { required: true })}
-              type="url"
-              placeholder="Photo URL"
-              className="input input-bordered w-full"
+              type="file"
+              className="md:w-1/2 file-input file-input-bordered w-full mt-4"
             />
             {errors.photoURL && (
               <span className="text-red-600 font-semibold">
-                Photo URL is required is required
+                Photo is required
               </span>
             )}
           </div>

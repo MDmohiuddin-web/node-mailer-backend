@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 
 const Layout = () => {
     return (
-        <div>
+        <div className="capitalize">
             <Navbar></Navbar>
             <Outlet></Outlet>
             {/* <Footer></Footer> */}
