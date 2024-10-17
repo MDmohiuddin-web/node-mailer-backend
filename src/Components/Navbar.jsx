@@ -3,6 +3,7 @@ import { AuthContext } from "../AUTHPROVIDER/AuthProvider";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/IOP.png";
 import userLogo from "../assets/profile.png";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
@@ -10,12 +11,12 @@ const Navbar = () => {
   const logout = () => {
     logOut()
       .then(() => {
-        //   toast.success("sign out success full");
+          toast.success("sign out success full");
         // window.location.reload();
       })
       .catch((error) => {
         console.error(error);
-        //   toast.error("User logOut Unsuccessfully");
+          toast.error("User logOut Unsuccessfully");
         // alert("User logOut successfully");
       });
   };
@@ -28,14 +29,24 @@ const Navbar = () => {
         </NavLink>
       </li>
       <li className="">
-        <NavLink to="/sendmail" className="hover:text-blue-400">
-        sendmail
+        <NavLink to="/Calpine" className="hover:text-blue-400">
+        Calpine
         </NavLink>
       </li>
 
       <li className="">
-        <NavLink to="/ContactUs" className="hover:text-blue-400">
-          Contact Us
+        <NavLink to="/messages" className="hover:text-blue-400">
+          messages
+        </NavLink>
+      </li>
+      <li className="">
+        <NavLink to="/SmtpPage" className="hover:text-blue-400">
+          smtps
+        </NavLink>
+      </li>
+      <li className="">
+        <NavLink to="/setting" className="hover:text-blue-400">
+          setting
         </NavLink>
       </li>
 

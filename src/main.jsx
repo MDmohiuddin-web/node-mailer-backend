@@ -9,6 +9,10 @@ import Signin from "./UserAuth/Signin.jsx";
 import Profile from "./UserAuth/Profile.jsx";
 import Sigup from "./UserAuth/Sigup.jsx";
 import Dataform from "./Components/Dataform.jsx";
+import Calpine from "./Pages/Calpine.jsx";
+import Massages from "./Pages/Massages.jsx";
+import SmtpPage from "./Pages/SmtpPage.jsx";
+import Setting from "./Pages/Setting.jsx";
 
 const router = createBrowserRouter([
   {
@@ -17,11 +21,23 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Home></Home>, 
+        element: <Home></Home>,
       },
       {
-        path: "/ContactUs",
-        element: <Home></Home>,
+        path: "/Calpine",
+        element: <Calpine></Calpine>,
+      },
+      {
+        path: "/messages",
+        element: <Massages></Massages>,
+      },
+      {
+        path: "/SmtpPage",
+        element: <SmtpPage></SmtpPage>,
+      },
+      {
+        path: "/setting",
+        element: <Setting></Setting>,
       },
       {
         path: "/Login",
@@ -34,10 +50,11 @@ const router = createBrowserRouter([
       {
         path: "/Signup",
         element: <Sigup></Sigup>,
-      },{
+      },
+      {
         path: "/sendmail",
-        element:<Dataform></Dataform>
-      }
+        element: <Dataform></Dataform>,
+      },
     ],
   },
 ]);
