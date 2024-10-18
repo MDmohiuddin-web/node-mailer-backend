@@ -35,13 +35,13 @@ const Calpine = () => {
                 htmlFor="FromName"
                 className="block mb-2 text-sm font-medium text-black"
               >
-                FromName
+                From Name
               </label>
               <input
                 {...register("FromName", { required: true })}
                 type="text"
                 id="FromName"
-                placeholder="FromName"
+                placeholder="From Name"
                 className="input input-bordered w-full"
               />
               {errors.FromName && (

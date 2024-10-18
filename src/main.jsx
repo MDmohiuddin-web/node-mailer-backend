@@ -16,6 +16,9 @@ import Setting from "./Pages/Setting.jsx";
 import LIsts from "./Pages/LIsts.jsx";
 import AddUser from "./Components/AddUser.jsx";
 
+import AddStuent from "./Components/AddStuent.jsx";
+import Student from "./Components/Student.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -62,6 +65,13 @@ const router = createBrowserRouter([
       },{
         path:'/AddUser',
         element:<AddUser></AddUser>
+      },{
+        path:'/addStudent',
+        element:<AddStuent></AddStuent>
+      },
+      {
+        path:"/Student",
+        element:<Student></Student>
       }
     ],
   },
