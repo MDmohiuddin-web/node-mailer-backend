@@ -1,8 +1,10 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import UseAxiosPublic from "../../Hook/UseAxiosPublic";
 
 const Dataform = () => {
   const [emailFields, setEmailFields] = useState([{ id: 0, value: "" }]);
+  const axiosPublic = UseAxiosPublic();
 
   const handleAddEmail = () => {
     const newField = { id: emailFields.length, value: "" };
@@ -32,27 +34,17 @@ const Dataform = () => {
       message: message,
     };
 
-    const baseUrl = "http://localhost:3000";
-
     try {
-      const res = await fetch(`${baseUrl}/email/sendEmail`, {
-        method: "POST",
-        body: JSON.stringify(dataSend),
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await axiosPublic.post('/email/sendEmail', dataSend);
 
-      if (res.ok) {
-        const data = await res.json();
-        console.log(data);
+      if (res.status === 200) {
+        console.log(res.data);
         toast.success("Email sent successfully!");
         form.reset();
         setEmailFields([{ id: 0, value: "" }]);
       } else {
         console.error("Error:", res.statusText);
-        alert("Failed to send email.");
+        toast.error("Failed to send email.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -74,12 +66,12 @@ const Dataform = () => {
               className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8"
             >
               <p className="text-center text-lg font-medium">
-                Send a message multiple emails
+                Send a message to multiple emails
               </p>
 
               <div>
                 <label htmlFor="name" className="sr-only">
-                  name
+                  Name
                 </label>
 
                 <div className="relative">
@@ -87,7 +79,7 @@ const Dataform = () => {
                     type="text"
                     name="name"
                     className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md"
-                    placeholder=" name"
+                    placeholder="Name"
                   />
                 </div>
               </div>
@@ -103,7 +95,7 @@ const Dataform = () => {
                       type="email"
                       name={`email-${field.id}`}
                       className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md"
-                      placeholder=" email"
+                      placeholder="Email"
                       value={field.value}
                       onChange={(e) =>
                         handleEmailChange(field.id, e.target.value)
@@ -123,7 +115,7 @@ const Dataform = () => {
 
               <div>
                 <label htmlFor="subject" className="sr-only">
-                  subject
+                  Subject
                 </label>
 
                 <div className="relative">
@@ -131,7 +123,7 @@ const Dataform = () => {
                     type="text"
                     name="subject"
                     className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md"
-                    placeholder=" subject"
+                    placeholder="Subject"
                   />
                 </div>
               </div>
@@ -143,9 +135,8 @@ const Dataform = () => {
 
                 <div className="relative">
                   <textarea
-                    placeholder="Enter text"
+                    placeholder="Enter message"
                     name="Message"
-                    id=""
                     className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md"
                   ></textarea>
                 </div>

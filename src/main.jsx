@@ -13,6 +13,8 @@ import Calpine from "./Pages/Calpine.jsx";
 import Massages from "./Pages/Massages.jsx";
 import SmtpPage from "./Pages/SmtpPage.jsx";
 import Setting from "./Pages/Setting.jsx";
+import LIsts from "./Pages/LIsts.jsx";
+import AddUser from "./Components/AddUser.jsx";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +36,9 @@ const router = createBrowserRouter([
       {
         path: "/SmtpPage",
         element: <SmtpPage></SmtpPage>,
+      },{
+        path:'lists',
+        element:<LIsts></LIsts>
       },
       {
         path: "/setting",
@@ -54,7 +59,10 @@ const router = createBrowserRouter([
       {
         path: "/sendmail",
         element: <Dataform></Dataform>,
-      },
+      },{
+        path:'/AddUser',
+        element:<AddUser></AddUser>
+      }
     ],
   },
 ]);

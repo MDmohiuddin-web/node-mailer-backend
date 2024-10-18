@@ -3,7 +3,7 @@ const Hero = () => {
     <section className=" text-white">
       <div className="mx-auto max-w-screen-xl px-4 py-10 lg:flex lg:h-screen lg:items-center">
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="bg-gradient-to-r from-green-300  via-blue-500 hover:animate-pulse to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent sm:text-5xl">
+          <h1 className="bg-gradient-to-r from-green-300  via-blue-500  to-purple-600 bg-clip-text text-3xl font-extrabold text-transparent sm:text-5xl">
             SMTP Mails system using nodemailer and react.js
           </h1>
 

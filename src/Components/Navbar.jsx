@@ -29,6 +29,11 @@ const Navbar = () => {
         </NavLink>
       </li>
       <li className="">
+        <NavLink to="/lists" className="hover:text-blue-400">
+        lists
+        </NavLink>
+      </li>
+      <li className="">
         <NavLink to="/Calpine" className="hover:text-blue-400">
         Calpine
         </NavLink>
@@ -61,7 +66,7 @@ const Navbar = () => {
     </>
   );
   return (
-    <div className="navbar mx-auto md:px-20 shadow-md">
+    <div className="navbar mx-auto md:px-20  ">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
