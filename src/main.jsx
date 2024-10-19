@@ -18,6 +18,8 @@ import AddUser from "./Components/AddUser.jsx";
 
 import AddStuent from "./Components/AddStuent.jsx";
 import Student from "./Components/Student.jsx";
+import SmtpAdd from "./Components/SmtpAdd.jsx";
+import SmtpUpdate from "./Components/SmtpUpdate.jsx";
 
 const router = createBrowserRouter([
   {
@@ -39,9 +41,10 @@ const router = createBrowserRouter([
       {
         path: "/SmtpPage",
         element: <SmtpPage></SmtpPage>,
-      },{
-        path:'lists',
-        element:<LIsts></LIsts>
+      },
+      {
+        path: "lists",
+        element: <LIsts></LIsts>,
       },
       {
         path: "/setting",
@@ -62,17 +65,29 @@ const router = createBrowserRouter([
       {
         path: "/sendmail",
         element: <Dataform></Dataform>,
-      },{
-        path:'/AddUser',
-        element:<AddUser></AddUser>
-      },{
-        path:'/addStudent',
-        element:<AddStuent></AddStuent>
       },
       {
-        path:"/Student",
-        element:<Student></Student>
-      }
+        path: "/AddUser",
+        element: <AddUser></AddUser>,
+      },
+      {
+        path: "/addStudent",
+        element: <AddStuent></AddStuent>,
+      },
+      {
+        path: "/Student",
+        element: <Student></Student>,
+      },
+      {
+        path: "/SmtpAdd",
+        element: <SmtpAdd></SmtpAdd>,
+      },
+      {
+        path: "/SmtpUpdate/:id",
+        element: <SmtpUpdate></SmtpUpdate>,
+        loader: ({ params }) =>
+          fetch(`http://localhost:3000/hosting/${params.id}`),
+      },
     ],
   },
 ]);

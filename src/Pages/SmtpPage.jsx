@@ -1,217 +1,137 @@
-  import { useState } from "react";
-  import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+
 import toast from "react-hot-toast";
-  import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
-  const SmtpPage = () => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+import UseAxiosPublic from "../../Hook/UseAxiosPublic";
+import { Button, Popconfirm } from "antd";
+import { Link } from "react-router-dom";
 
-    const togglePasswordVisibility = () => {
-      setShowPassword(!showPassword);
-    };
-    const {
-      register,
-      handleSubmit,
-      reset,
-      formState: { errors },
-    } = useForm();
-    const onSubmit = (data) => {
-      setIsLoading(true);
-      // Here you would typically send the data to your server
-      console.log(data);
-      // Simulate an API call
-      setTimeout(() => {
-        setIsLoading(false);
-        reset();
-        // Here you might want to show a success message to the user
-        toast.success("Email sent successfully!");
-      }, 2000);
-    };
+const SmtpPage = () => {
+  const [users, setUsers] = useState([]);
 
-    return (
-      <div
-        className="my-20 mx-auto md:w-[48%]
-  bg-gray-50 p-8 rounded-lg shadow-lg"
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label
-              htmlFor="SMTPServer"
-              className="block mb-2 text-sm font-medium text-black "
-            >
-              SMTP Server
-            </label>
+  const axiosPublic = UseAxiosPublic();
 
-            <div className="relative">
-              <select
-                {...register("SMTPServer", { required: true })}
-                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md hover:border-gray-300"
-              >
-                <option value="">Select SMTP Server</option>
-                <option value="smtp.gmail.com">Gmail (smtp.gmail.com)</option>
-                <option value="smtp.mail.yahoo.com">
-                  Yahoo (smtp.mail.yahoo.com)
-                </option>
-                <option value="smtp-mail.outlook.com">
-                  Hotmail (smtp-mail.outlook.com)
-                </option>
-                <option value="smtp.hostingmail.com">
-                  HostingMail (smtp.hostingmail.com)
-                </option>
-              </select>
-            </div>
-          </div>
-          <div className="md:flex justify-around ">
-            {/* for port */}
-            <div className="md:w-[48%]">
-              <label
-                htmlFor="port"
-                className="block mb-2 text-sm font-medium text-black "
-              >
-                Port
-              </label>
+  useEffect(() => {
+    axiosPublic
+      .get("/hosting")
+      .then((response) => setUsers(response.data))
+      .catch((error) => console.error("Error fetching users:", error));
+  }, [axiosPublic]);
 
-              <div className="relative ">
-                <input
-                min={465}
-                  {...register("port", { required: true })}
-                  type="number"
-                  className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md hover:border-gray-300"
-                  placeholder="Enter Port"
-                />
-              </div>
-            </div>
-            {/* for security */}
-            <div className="md:w-[48%]">
-              <label
-                htmlFor="security"
-                className="block mb-2 text-sm font-medium text-black "
-              >
-                Security
-              </label>
-
-              <div className="relative">
-                <select
-                  {...register("security", { required: true })}
-                  className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md hover:border-gray-300"
-                >
-                  <option value="none">None</option>
-                  <option value="TLS">TLS</option>
-                  <option value="SSL">SSL</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div className="md:flex justify-between ">
-            <div className="md:w-[48%]">
-              <label
-                htmlFor="name"
-                className="block mb-2 text-sm font-medium text-black "
-              >
-                Name
-              </label>
-
-              <div className="relative">
-                <input
-                  {...register("name", { required: true })}
-                  type="text"
-                  className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md hover:border-gray-300"
-                  placeholder="Enter Name"
-                />
-                {errors.name && (
-                  <span className="text-red-600 font-semibold">
-                    Name is required
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div
-              className=" relative md:w-[48%]
-  "
-            >
-              <div className="flex justify-between">
-                <label className="block mb-2 text-sm font-medium text-black  ">
-                  Password
-                </label>
-              </div>
-
-              <input
-                {...register("password", { required: true })}
-                autoComplete="off"
-                placeholder="password"
-                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md hover:border-gray-300"
-                type={showPassword ? "text" : "password"}
-              />
-              {errors.password && (
-                <span className="text-red-600 font-semibold">
-                  Password is required
-                </span>
-              )}
-              <div
-                className="flex justify-end p-1 absolute top-10 right-5"
-                onClick={togglePasswordVisibility}
-              >
-                {showPassword ? <FaEye /> : <FaEyeSlash />}
-              </div>
-            </div>
-          </div>
-          <div className="md:flex justify-between ">
-            {/* for from email  */}
-            <div
-              className="md:w-[48%]
-  "
-            >
-              <label className="block mb-2 text-sm font-medium text-black  ">
-                From Email Address
-              </label>
-              <input
-                {...register("Fromemail", { required: true })}
-                placeholder="From Email Address"
-                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md hover:border-gray-300"
-                type="email"
-              />
-              {errors.Fromemail && (
-                <span className="text-red-600 font-semibold">
-                  From Email Address is required
-                </span>
-              )}
-
-            </div>
-            {/* for from email  */}
-            <div
-              className="md:w-[48%]
-  "
-            >
-              <label className="block mb-2 text-sm font-medium text-black  ">
-                To Email Address
-              </label>
-              <input
-                {...register("Toemail", { required: true })}
-                placeholder="To Email Address"
-                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-md hover:border-gray-300"
-                type="email"
-              />
-              {errors.Toemail && (
-                <span className="text-red-600 font-semibold">
-                  To Email Address is required
-                </span>
-              )}
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full sm:mt-4 bg-blue-500 px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50"
-          >
-            {isLoading ? "Sending In..." : "Send Mail"}
-          </button>
-        </form>
-      </div>
-    );
+  const handleDelete = async (userId) => {
+    try {
+      const response = await axiosPublic.delete(`/hosting/${userId}`);
+      console.log("User deleted:", response.data);
+      toast.success("User deleted successfully!");
+      setUsers(users.filter((user) => user._id !== userId));
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      if (error.response) {
+        console.error("Response error:", error.response.data);
+        toast.error(
+          "An error occurred while deleting the user: " +
+            error.response.data.message
+        );
+      } else if (error.request) {
+        console.error("Request error:", error.request);
+        toast.error("No response from the server. Please try again later.");
+      } else {
+        console.error("General error:", error.message);
+        toast.error("An error occurred: " + error.message);
+      }
+    }
   };
 
-  export default SmtpPage;
+  // const handleupdate = async (userId) => {
+  //   try {
+  //     const response = await axiosPublic.put(`/hosting/${userId}`);
+  //     console.log("User deleted:", response.data);
+  //     toast.success("User deleted successfully!");
+  //     setUsers(users.filter((user) => user._id !== userId));
+  //   } catch (error) {
+  //     console.error("Error deleting user:", error);
+  //     if (error.response) {
+  //       console.error("Response error:", error.response.data);
+  //       toast.error(
+  //         "An error occurred while deleting the user: " +
+  //           error.response.data.message
+  //       );
+  //     } else if (error.request) {
+  //       console.error("Request error:", error.request);
+  //       toast.error("No response from the server. Please try again later.");
+  //     } else {
+  //       console.error("General error:", error.message);
+  //       toast.error("An error occurred: " + error.message);
+  //     }
+  //   }
+  // };
+
+  return (
+    <div className="overflow-x-auto md:w-4/5 m-auto min-h-[400px] capitalize">
+      <div className="gap-3  flex w-1/2 ">
+        <Link to="/SmtpAdd">
+          <Button
+            type="primary "
+            className="  bg-blue-500 px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50"
+          >
+            add New Smtp
+          </Button>
+        </Link>
+      </div>
+      <table className="table ">
+        {/* head */}
+        <thead>
+          <tr>
+            <th>SL</th>
+            <th>Email</th>
+            <th>password</th>
+            <th>SMTP Host Name</th>
+            <th>port</th>
+            <th>security</th>
+            <th>action</th>
+            <th>action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {/* row 1 */}
+          {users.map((user, index) => (
+            <tr key={user._id}>
+              <th>{index + 1}</th>
+              <td>{user.email}</td>
+              <td>{user.password}</td>
+              <td>{user.SMTPServer}</td>
+              <td>{user.port}</td>
+              <td>{user.security}</td>
+
+              <th>
+                <Popconfirm
+                  title="Delete the user"
+                  description="Are you sure to delete this user?"
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => handleDelete(user._id)}
+                >
+                  <Button danger>Delete</Button>
+                </Popconfirm>
+              </th>
+              <th>
+                <Popconfirm
+                  title="update the user"
+                  description="Are you sure to update this user?"
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Link to={`/SmtpUpdate/${user._id}`}>
+                  <Button danger>update</Button></Link>
+                </Popconfirm>
+              </th>
+            </tr>
+          ))}
+        </tbody>
+        {/* foot */}
+      </table>
+    </div>
+  );
+};
+
+export default SmtpPage;
