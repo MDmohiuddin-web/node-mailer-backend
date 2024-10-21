@@ -35,7 +35,7 @@ const Dataform = () => {
     };
 
     try {
-      const res = await axiosPublic.post('/email/sendEmail', dataSend);
+      const res = await axiosPublic.post('/email/send-email', dataSend);
 
       if (res.status === 200) {
         console.log(res.data);

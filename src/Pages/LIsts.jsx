@@ -7,8 +7,8 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import Student from "../Components/Student";
 
 const LIsts = () => {
-  const [users, setUsers] = useState([]);
   const axiosPublic = UseAxiosPublic();
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     axiosPublic

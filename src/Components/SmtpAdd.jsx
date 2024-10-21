@@ -3,11 +3,12 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import UseAxiosPublic from "../../Hook/UseAxiosPublic";
+import { useNavigate } from "react-router-dom";
 
 const SmtpAdd = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const navigate=useNavigate()
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -43,6 +44,7 @@ const SmtpAdd = () => {
           console.log(res.data);
           toast.success("Data sent successfully!");
         }
+        navigate('/SmtpPage')
         reset();
       } else {
         console.error("Error:", res.statusText);

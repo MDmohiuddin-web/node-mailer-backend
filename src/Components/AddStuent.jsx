@@ -1,8 +1,10 @@
 import { useForm } from "react-hook-form";
 import UseAxiosPublic from "../../Hook/UseAxiosPublic";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const AddStuent = () => {
+  const navigate=useNavigate()
   const axiosPublic = UseAxiosPublic();
   const {
     register,
@@ -21,7 +23,7 @@ const AddStuent = () => {
     };
 
     try {
-      const res = await axiosPublic.post("/student", dataSend);
+      const res = await axiosPublic.post("/students", dataSend);
 
       if (res.status === 200) {
         if (res.data.insertedId === null && res.data.message === "this user already exists") {
@@ -32,6 +34,7 @@ const AddStuent = () => {
           toast.success("Data sent successfully!");
         }
         reset();
+        navigate('/lists')
       } else {
         console.error("Error:", res.statusText);
         toast.error("Failed to send data.");

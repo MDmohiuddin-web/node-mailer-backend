@@ -88,8 +88,8 @@ const SmtpPage = () => {
             <th>SMTP Host Name</th>
             <th>port</th>
             <th>security</th>
-            <th>action</th>
-            <th>action</th>
+            <th>Delete</th>
+            <th>update</th>
           </tr>
         </thead>
         <tbody>

@@ -1,9 +1,9 @@
-
+import Test from "../Components/Test";
 
 const Massages = () => {
     return (
         <div>
-            <h1>Massages</h1>
+          <Test></Test>
             
         </div>
     );

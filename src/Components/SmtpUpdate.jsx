@@ -3,9 +3,11 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import UseAxiosPublic from "../../Hook/UseAxiosPublic";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const SmtpUpdate = () => {
+
+    const navigate=useNavigate()
   const { id } = useParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,6 +60,7 @@ const SmtpUpdate = () => {
       if (res.status === 200) {
         console.log(res.data);
         toast.success("Data updated successfully!");
+        navigate('/SmtpPage')
 
         reset();
       } else {
@@ -73,7 +76,7 @@ const SmtpUpdate = () => {
   };
 
   if (!userData) {
-    return <div>Loading...</div>;
+    return <div className="text-4xl w-4/5 m-auto text-center">Loading...</div>;
   }
 
   return (

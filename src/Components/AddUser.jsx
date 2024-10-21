@@ -1,9 +1,11 @@
 import { useForm } from "react-hook-form";
 import UseAxiosPublic from "../../Hook/UseAxiosPublic";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const AddUser = () => {
   const axiosPublic = UseAxiosPublic();
+  const navigate=useNavigate()
   const {
     register,
     handleSubmit,
@@ -31,6 +33,7 @@ const AddUser = () => {
           console.log(res.data);
           toast.success("Data sent successfully!");
         }
+        navigate('/lists')
         reset();
       } else {
         console.error("Error:", res.statusText);

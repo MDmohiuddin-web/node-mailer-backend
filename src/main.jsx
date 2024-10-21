@@ -85,8 +85,6 @@ const router = createBrowserRouter([
       {
         path: "/SmtpUpdate/:id",
         element: <SmtpUpdate></SmtpUpdate>,
-        loader: ({ params }) =>
-          fetch(`http://localhost:3000/hosting/${params.id}`),
       },
     ],
   },

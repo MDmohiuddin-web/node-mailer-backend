@@ -9,14 +9,14 @@ const Student = () => {
 
   useEffect(() => {
     axiosPublic
-      .get("/student")
+      .get("/students")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, [axiosPublic]);
 
   const handleDelete = async (userId) => {
     try {
-      const response = await axiosPublic.delete(`/student/${userId}`);
+      const response = await axiosPublic.delete(`/students/${userId}`);
       console.log("User deleted:", response.data);
       toast.success("User deleted successfully!");
       setUsers(users.filter((user) => user._id !== userId));
