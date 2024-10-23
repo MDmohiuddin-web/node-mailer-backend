@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import Test from "./Components/Test.jsx";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./Layout/Layout.jsx";
@@ -85,7 +86,10 @@ const router = createBrowserRouter([
       {
         path: "/SmtpUpdate/:id",
         element: <SmtpUpdate></SmtpUpdate>,
-      },
+      },{
+        path:'/SendEmail',
+        element:<Test></Test>
+      }
     ],
   },
 ]);
