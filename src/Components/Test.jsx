@@ -1,46 +1,26 @@
 import { useState } from "react";
 import UseAxiosPublic from "../../Hook/UseAxiosPublic";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
 
 const EmailForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const axiosPublic = UseAxiosPublic();
-  const [collection, setCollection] = useState("users");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
-  const handleCollectionChange = (e) => {
-    setCollection(e.target.value);
-    console.log("Collection:", e.target.value);
-    axiosPublic.get(`/${e.target.value}`);
-  };
-
-  const handleSubjectChange = (e) => {
-    setSubject(e.target.value);
-    console.log("Subject:", e.target.value);
-  };
-
-  const handleMessageChange = (e) => {
-    setMessage(e.target.value);
-    console.log("Message:", e.target.value);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setIsLoading(true);
-    console.log("Form submitted with values:", {
-      collection,
-      subject,
-      message,
-    });
+    console.log("Form submitted with values:", data);
     try {
-      const response = await axiosPublic.post("/email/send-email", {
-        collection,
-        subject,
-        message,
-      });
+      const response = await axiosPublic.post("/email/send-email", data);
       console.log("Response:", response.data);
       toast.success(response.data.message);
+      reset();
     } catch (error) {
       console.error("Error sending email:", error);
       toast.error("Failed to send emails.");
@@ -51,39 +31,34 @@ const EmailForm = () => {
 
   return (
     <form
-      onSubmit={handleSubmit}
-      className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8 w-96 mx-auto"
+      onSubmit={handleSubmit(onSubmit)}
+      className="my-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8 w-96 mx-auto"
     >
       <div className="flex flex-col">
         <label htmlFor="collection">Select Collection:</label>
-        <select
-          id="collection"
-          value={collection}
-          onChange={handleCollectionChange}
-        >
+        <select {...register("collection", { required: true })} className="input input-bordered w-full">
           <option value="users">Users</option>
           <option value="students">Students</option>
         </select>
+        {errors.collection && <span>This field is required</span>}
       </div>
       <div className="flex flex-col">
         <label htmlFor="subject">Subject:</label>
         <input
           type="text"
-          id="subject"
-          value={subject}
-          onChange={handleSubjectChange}
-          required
+          className="input input-bordered w-full"
+          {...register("subject", { required: true })}
         />
+        {errors.subject && <span>This field is required</span>}
       </div>
 
       <div className="flex flex-col">
         <label htmlFor="message">Message:</label>
         <textarea
-          id="message"
-          value={message}
-          onChange={handleMessageChange}
-          required
+        className="input input-bordered w-full"
+          {...register("message", { required: true })}
         ></textarea>
+        {errors.message && <span>This field is required</span>}
       </div>
       <button
         type="submit"

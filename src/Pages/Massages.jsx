@@ -42,14 +42,10 @@ const Massages = () => {
               <td>{user?.from.match(/"([^"]+)"/)[1]}</td>
               <td>{user?.from.match(/<([^>]+)>/)[1]}</td>
               <td>{user.subject.replace(/^Re: /, "")}</td>
-
-              {/* <td>{user?.receivedAt ? "Yes" : "No Response Yet"}</td> */}
-
-              {/* <td>{user?.text.split("\n")[0]}</td> */}
-
               <td>
-                <textarea>{user?.text.split("\n")[0]}</textarea>
+                <textarea defaultValue={user?.text.split("\n")[0]} />
               </td>
+              <td>{user?.text.match(/On (.*), (.*) wrote:/)?.[1]}</td>
             </tr>
           ))}
         </tbody>

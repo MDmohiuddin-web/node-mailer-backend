@@ -49,11 +49,11 @@ const Navbar = () => {
           smtps
         </NavLink>
       </li>
-      <li className="">
+      {/* <li className="">
         <NavLink to="/setting" className="hover:text-blue-400">
           setting
         </NavLink>
-      </li>
+      </li> */}
 
       {user?.email ? (
         <></>
